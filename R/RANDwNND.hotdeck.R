@@ -78,20 +78,20 @@ RANDwNND.hd <- function (rec, don, dfun="Manhattan", cut.don="rot", k=NULL, w.do
     
     if(dfun=="Euclidean" || dfun=="Manhattan"){
    #     require(proxy)
-        x.rec <- fact2dummy(x.rec, all=FALSE)
-        x.don <- fact2dummy(x.don, all=FALSE)
-        mdist <- dist(x=x.rec, y=x.don, method=dfun, ...)
+        x.rec <- fact2dummy(x.rec, all=TRUE)
+        x.don <- fact2dummy(x.don, all=TRUE)
+        mdist <- proxy::dist(x=x.rec, y=x.don, method=dfun, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
     }
 	else if(dfun=="Mahalanobis" || dfun=="mahalanobis"){
-        if(is.data.frame(x.rec)) x.rec <- fact2dummy(x.rec, all=FALSE)
-        if(is.data.frame(x.don)) x.don <- fact2dummy(x.don, all=FALSE)
+        if(is.data.frame(x.rec)) x.rec <- fact2dummy(x.rec, all=TRUE)
+        if(is.data.frame(x.don)) x.don <- fact2dummy(x.don, all=TRUE)
         mdist <- mahalanobis.dist(data.x=x.rec, data.y=x.don, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
 	}
 	else if(dfun=="minimax" || dfun=="MiniMax" || dfun=="Minimax"){
-        x.rec <- fact2dummy(x.rec, all=FALSE)
-        x.don <- fact2dummy(x.don, all=FALSE)
+        x.rec <- fact2dummy(x.rec, all=TRUE)
+        x.don <- fact2dummy(x.don, all=TRUE)
         mdist <- maximum.dist(data.x=x.rec, data.y=x.don, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
 	}
@@ -121,7 +121,7 @@ RANDwNND.hd <- function (rec, don, dfun="Manhattan", cut.don="rot", k=NULL, w.do
         if(cut.don=="min") k0 <- 10
         else if (cut.don=="k.dist") stop("When dist.fun='RANN' it is not possible to to set \n cut.don = 'k.dist' ")
         else k0 <- k
-        dd <- nn2(data=x.don, query=x.rec, k=k0, ...)
+        dd <- RANN::nn2(data=x.don, query=x.rec, k=k0, ...)
         mdist <- dd$nn.dists
     }
     else if(dfun=="difference" || dfun=="diff"){
@@ -133,7 +133,7 @@ RANDwNND.hd <- function (rec, don, dfun="Manhattan", cut.don="rot", k=NULL, w.do
 
     else {
   #      require(proxy)
-        mdist <- dist(x=x.rec, y=x.don, method=dfun, ...)
+        mdist <- proxy::dist(x=x.rec, y=x.don, method=dfun, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
     }
 

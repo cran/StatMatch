@@ -64,26 +64,26 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
         if (dfun == "Euclidean" || dfun == "euclidean" || dfun == 
             "Manhattan" || dfun == "manhattan") {
             if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = FALSE)
+                x.rec <- fact2dummy(x.rec, all = TRUE)
             if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = FALSE)
-            mdist <- dist(x = x.rec, y = x.don, method = dfun, 
+                x.don <- fact2dummy(x.don, all = TRUE)
+            mdist <- proxy::dist(x = x.rec, y = x.don, method = dfun, 
                           ...)
         }
         else if (dfun == "Mahalanobis" || dfun == "mahalanobis") {
             if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = FALSE)
+                x.rec <- fact2dummy(x.rec, all = TRUE)
             if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = FALSE)
+                x.don <- fact2dummy(x.don, all = TRUE)
             mdist <- mahalanobis.dist(data.x = x.rec, data.y = x.don, 
                                       ...)
         }
         else if (dfun == "minimax" || dfun == "MiniMax" || dfun == 
                  "Minimax") {
             if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = FALSE)
+                x.rec <- fact2dummy(x.rec, all = TRUE)
             if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = FALSE)
+                x.don <- fact2dummy(x.don, all = TRUE)
             mdist <- maximum.dist(data.x = x.rec, data.y = x.don, 
                                   ...)
         }
@@ -107,7 +107,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
             mdist[is.na(mdist)] <- 1
         }
         else {
-            mdist <- dist(x = x.rec, y = x.don, method = dfun, 
+            mdist <- proxy::dist(x = x.rec, y = x.don, method = dfun, 
                           ...)
         }
         dimnames(mdist) <- list(r.lab, d.lab)
@@ -136,7 +136,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
                 r.rhs <- rep(1, nr)
                 c.sig <- rep("<=", nd)
                 c.rhs <- rep(k, nd)
-                appo <- lp.transport(cost.mat = mdist, row.signs = r.sig, 
+                appo <- lpSolve::lp.transport(cost.mat = mdist, row.signs = r.sig, 
                                      row.rhs = r.rhs, col.signs = c.sig, col.rhs = c.rhs)
             } 
                 
@@ -145,7 +145,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
                 r.rhs <- rep(1, nr)
                 c.sig <- rep("<=", nd)
                 c.rhs <- rep(k, nd)
-                appo <- lp.transport(cost.mat = mdist, row.signs = r.sig, 
+                appo <- lpSolve::lp.transport(cost.mat = mdist, row.signs = r.sig, 
                                      row.rhs = r.rhs, col.signs = c.sig, col.rhs = c.rhs)
             }
             else if (nr > nd) {
@@ -159,7 +159,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
                 r.rhs <- rep(1, nr)
                 c.sig <- rep("<=", nd)
                 c.rhs <- rep(k, nd)
-                appo <- lp.transport(cost.mat = mdist, row.signs = r.sig, 
+                appo <- lpSolve::lp.transport(cost.mat = mdist, row.signs = r.sig, 
                                      row.rhs = r.rhs, col.signs = c.sig, col.rhs = c.rhs)
             }
             sol <- appo$solution

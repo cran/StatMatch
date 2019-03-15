@@ -15,17 +15,17 @@ harmonize.x(svy.A, svy.B, form.x, x.tot=NULL,
 \arguments{
 
 \item{svy.A}{
-A \code{svydesign} \R object that stores the data collected in the the survey A and all the information concerning the sampling design.  This object can be created by using the function \code{\link[survey]{svydesign}} in the package \pkg{survey}.
+A \code{svydesign} \R object that stores the data collected in the the survey A and all the information concerning the corresponding sampling design.  This object can be created by using the function \code{\link[survey]{svydesign}} in the package \pkg{survey}.
 }
 
 \item{svy.B}{
-A \code{svydesign} \R object that stores the data collected in the the survey B and all the information concerning the sampling design.  This object can be created by using the function \code{\link[survey]{svydesign}} in the package \pkg{survey}.}
+A \code{svydesign} \R object that stores the data collected in the the survey B and all the information concerning the corresponding sampling design.  This object can be created by using the function \code{\link[survey]{svydesign}} in the package \pkg{survey}.}
 
 \item{form.x}{
 A \R formula specifying which of the variables, common to both the surveys, have to be considered, and how have to be considered.  For instance \cr
 \code{form.x=~x1+x2} means that the marginal distribution of the variables x1 and x2 have to be harmonized and there is also an \sQuote{Intercept}.  In order to skip the intercept the formula has to be written in the following manner \cr \code{form.x=~x1+x2-1}.
 
-When dealing with categorical variables, if the formula is written in the following manner \code{form.x=~x1:x2-1} it means that the harmonization has to be carried out by considering the joint distribution of the two variables (x1 vs. x2).  To better understand how \code{form.x} works see \code{\link[stats]{model.matrix}} (see also \code{\link[stats]{formula}}).
+When dealing with categorical variables, the formula \code{form.x=~x1:x2-1} means that the harmonization has to be carried out by considering the joint distribution of the two variables (x1 vs. x2).  To better understand how \code{form.x} works see \code{\link[stats]{model.matrix}} (see also \code{\link[stats]{formula}}).
 
 Due to weights calibration features, it is preferable to work with categorical \bold{X} variables.  In some cases, the procedure may be successful when a single continuous variable is considered jointly with one or more categorical variables.  When dealing with several continuous variable it may be preferable to categorize them.
 }
@@ -37,16 +37,14 @@ When \code{x.tot} is not provided (i.e. \code{x.tot=NULL}) then the vector of to
 }
 
 \item{cal.method}{
-A string that specifies how the calibration of the weights in \code{svy.A} and \code{svy.B} has to be carried out.  By default \code{cal.method="linear"} linear calibration is performed.  In particular, the calibration is carried out by mean of the function \code{\link[survey]{calibrate}} in the package \pkg{survey}.
+A string that specifies how the calibration of the weights in \code{svy.A} and \code{svy.B} has to be carried out.  By default linear calibration is performed ( \code{cal.method="linear"}).  In particular, the calibration is carried out by mean of the function \code{\link[survey]{calibrate}} in the package \pkg{survey}.
 
 Alternatively, it is possible to rake the origin survey weights by specifying \code{cal.method="raking"}.  Finally, it is possible to perform a simple post-stratification by setting \code{cal.method="poststratify"}.  Note that in this case the weights adjustments are carried out by considering the function \cr
 \code{\link[survey]{postStratify}} in the package \pkg{survey}.
 }
 \item{...}{
 
-Further arguments that may be necessary for calibration or post-stratification.  In particular, when \code{cal.method="linear"} there is the chance of having negative weights.  This drawback can be avoided by requiring that the final weights lie in a given interval specified via \code{bounds} argument (an argument of \code{\link[survey]{calibrate}}).  In sample surveys  one expects that weights are greater than or equal to 1, i.e. \code{bounds=c(1, Inf)}.
-
-The number of iterations used in calibration can be modified too by using the argument \code{maxit} (by default \code{maxit=50}).
+Further arguments that may be necessary for calibration or post-stratification.  The number of iterations used in calibration can be modified too by using the argument \code{maxit} (by default \code{maxit=50}).
 
 See \code{\link[survey]{calibrate}} for further details.
 
@@ -59,9 +57,9 @@ This function harmonizes the totals of the \bold{X} variables, observed in both 
 
 The calibration procedure may not produce the final result due to convergence problems.  In this case an error message appears.  In order to reach convergence it may be necessary to launch the procedure with less constraints (i.e a reduced number of population totals) by joining adjacent categories or by discarding some variables.  
 
-In some limited cases it could be possible to consider both categorical and continuous variables.  In this situation it may happen that calibration is not successful.  In order to reach convergence it may be necessary to categorize the continuous \bold{X} variables.
+In some limited cases, it could be possible to consider both categorical and continuous variables.  In this situation it may happen that calibration is not successful.  In order to reach convergence it may be necessary to categorize the continuous \bold{X} variables.
 
-Post-stratification is a special case of calibration; all the weights of the units in a given post-stratum are modified so the reproduce the known total for that post-stratum.  Post-stratification avoids problems of convergence but, on the other hand it may produce final weights with a higher variability than those derived from the calibration.
+Post-stratification is a special case of calibration; all the weights of the units in a given post-stratum are modified so as to reproduce the known total for that post-stratum.  Post-stratification avoids problems of convergence but, on the other hand, it may produce final weights with a higher variability than those derived from the calibration.
 
 }
 
@@ -117,6 +115,7 @@ data(quine, package="MASS") #loads quine from MASS
 str(quine)
 
 # split quine in two subsets
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(7654)
 lab.A <- sample(nrow(quine), 70, replace=TRUE)
 quine.A <- quine[lab.A, c("Eth","Sex","Age","Lrn")]
@@ -225,22 +224,6 @@ svytable(formula=~Eth, design=out.hz$cal.B)
 svytable(formula=~Sex+Age, design=out.hz$cal.A)
 svytable(formula=~Sex+Age, design=out.hz$cal.B)
 
-#-----------------------------------------------------
-# example (4)
-# Harmonizazion wrt the joint distribution
-# of ('Sex' x 'Age' x 'Eth')
-
-# vector of population total known
-# estimated from the full data set
-# note the formula!
-tot.m <- colSums(model.matrix(~Eth:Sex:Age-1, data=quine))
-tot.m
-
-out.hz <- harmonize.x(svy.A=svy.qA, svy.B=svy.qB, x.tot=tot.m,
-            form.x=~Eth:Sex:Age-1, cal.method="linear")
-tot.m
-svytable(formula=~Eth+Sex+Age, design=out.hz$cal.A)
-svytable(formula=~Eth+Sex+Age, design=out.hz$cal.B)
 
 }
 
