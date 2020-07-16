@@ -93,6 +93,7 @@ Finally, AIC (and BIC) is calculated, as suggested in Sakamoto and Akaike (1977)
 
 being \eqn{I(J-1)}{I*(J-1)} the parameters (conditional probabilities) to estimate. Note that the \R package \pkg{catdap} provides functions to identify the best subset of predictors based on AIC.
 
+Please note that the missing values are excluded from the tables and therefore excluded from the estimation of the various measures.
 }
 
 \value{

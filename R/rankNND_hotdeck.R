@@ -115,7 +115,7 @@ rankNND.hd <- function (x.rec, x.don, w.rec=NULL, w.don=NULL, constr=FALSE, c.al
     # the function solve_LSAP() in package clue is used
     if(constr && (c.alg=="Hungarian" || c.alg=="hungarian")){
         if(nr > nd) stop("It is required that no. of donors is greater \n or equal than the no. of recipients")
-        sol <- solve_LSAP(x=mdist, maximum=FALSE)
+        sol <- clue::solve_LSAP(x=mdist, maximum=FALSE)
         don.pos <- as.integer(sol)
         dist.rd <- mdist[cbind(1:nr, don.pos)]
         nad=NULL

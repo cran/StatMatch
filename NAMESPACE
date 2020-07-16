@@ -4,16 +4,19 @@
 exportPattern(".")
 
 # Import all packages listed as Imports or Depends
-#importFrom("lpSolve", lp.assign, lp.transport)
+
 import(
   proxy,
-  clue,
   survey,
-  RANN,
-  lpSolve
+  ggplot2
 )
  importFrom("stats", "as.formula", "chisq.test", "coefficients", "cor",
-     "cov2cor", "lm", "mahalanobis", "model.frame",
-     "model.matrix", "qchisq", "residuals", "rnorm", "runif",
+     "cov2cor", "IQR","lm", "mahalanobis", "model.frame",
+     "model.matrix", "model.matrix.lm","quantile", "qchisq", "residuals", "rnorm", "runif",
      "sd", "var", "weights", "xtabs", "ftable", "loglin")
- importFrom("utils", "combn")
+ importFrom("utils", "combn", "globalVariables")
+ importFrom("graphics", "plot", "lines", "axis", "text", "par")
+ importFrom("lpSolve", lp.assign, lp.transport) 
+# importFrom("clue", "solve_LSAP")
+# importFrom("RANN", "nn2")
+# importFrom("Hmisc", "wtd.quantile")

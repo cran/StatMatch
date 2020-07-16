@@ -34,7 +34,7 @@ The variables used in computing distances may contain missing values but only a 
 \item{don.class}{
 A character vector with the names of the variables (columns in both the data frames) that have to be used to identify the donation classes.  In this case the computation of distances is limited to those units of \code{data.rec} and \code{data.doc} that belong to the same donation class.  The case of empty donation classes should be avoided.  It would be preferable that variables used to form donation classes are defined as \code{factor}.
 
-The variables chosen for the creation of the donation clasess should NOT contain missing values (NAs).
+The variables chosen for the creation of the donation classes should NOT contain missing values (NAs).
 
 When not specified (default), no donation classes are used.  This choice may require more memory to store a larger distance matrix and a higher computational effort.
 }
@@ -42,7 +42,7 @@ When not specified (default), no donation classes are used.  This choice may req
 \item{dist.fun}{
 A string with the name of the distance function that has to be used.  The following distances are allowed: \dQuote{Manhattan} (aka \dQuote{City block}; default), \dQuote{Euclidean}, \dQuote{Mahalanobis},\dQuote{exact} or \dQuote{exact matching}, \dQuote{Gower}, \dQuote{minimax} or one of the distance functions available in the package \pkg{proxy}.  Note that the distance is computed using the function  \code{\link[proxy]{dist}} of the package \pkg{proxy} with the exception of the \dQuote{Gower} (see function \code{\link[StatMatch]{gower.dist}} for details), \dQuote{Mahalanobis} (function \code{\link[StatMatch]{mahalanobis.dist}}) and \dQuote{minimax} (see \code{\link[StatMatch]{maximum.dist}}) cases.
 
-When \code{dist.fun="Manhattan"}, \code{"Euclidean"}, \code{"Mahalanobis"} or \code{"minimax"} all the non numeric variables in \code{data.rec} and \code{data.don} will be converted to numeric.  On the contrary, when \code{dist.fun="exact"} or \code{dist.fun="exact matching"}, all the variables in \code{data.rec} and \code{data.don} will be converted to character and, as far as the distance computation is concerned, they will be treated as categorical nominal variables, i.e. distance is 0 if a couple of units presents the same response category and 1 otherwise. 
+When \code{dist.fun="Manhattan"}, \code{"Euclidean"}, \code{"Mahalanobis"} or \code{"minimax"} all the matching variables in \code{data.rec} and \code{data.don} must be numeric.  When \code{dist.fun="exact"} or \code{dist.fun="exact matching"}, all the variables in \code{data.rec} and \code{data.don} will be converted to character and, as far as the distance computation is concerned, they will be treated as categorical nominal variables, i.e. distance is 0 if a couple of units presents the same response category and 1 otherwise. 
 }
 
 \item{constrained}{

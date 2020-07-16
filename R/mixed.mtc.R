@@ -218,7 +218,7 @@ function (data.rec, data.don, match.vars, y.rec, z.don, method="ML", rho.yz=NULL
 		        r.rhs <- rep(1, nA)
 		        c.sig <- rep("<=", nB)
 		        c.rhs <- rep(1, nB)
-		        appo <- lp.transport(cost.mat=madist, row.signs=r.sig, row.rhs=r.rhs, col.signs=c.sig, col.rhs=c.rhs)
+		        appo <- lpSolve::lp.transport(cost.mat=madist, row.signs=r.sig, row.rhs=r.rhs, col.signs=c.sig, col.rhs=c.rhs)
 		    }   
 		    sol <- appo$solution
 		    ss <- c(t(sol))
@@ -231,7 +231,7 @@ function (data.rec, data.don, match.vars, y.rec, z.don, method="ML", rho.yz=NULL
 		else if(constr.alg=="hungarian" || constr.alg=="Hungarian"){
 		    if(nA > nB) stop("It is required  that the no. of donors \n 
 		                      is equal or greater than the no. of recipients")
-		    sol <- solve_LSAP(x=madist, maximum=FALSE)
+		    sol <- clue::solve_LSAP(x=madist, maximum=FALSE)
 		    don.lab <- B.lab[as.integer(sol)]
 		    dist.rd <- madist[cbind(A.lab, don.lab)]
         }

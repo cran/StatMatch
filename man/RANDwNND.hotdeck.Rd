@@ -42,7 +42,7 @@ A string with the name of the distance function that has to be used.  The follow
 
 By setting \code{dist.fun="ANN"} or \code{dist.fun="RANN"} it is possible to search for the \code{k} nearest neighbours for each recipient record by using the the Approximate Nearest Neighbor (ANN) search as implemented in the  function \code{\link[RANN]{nn2}} provided by the package \pkg{RANN}.
 
-When \code{dist.fun="Manhattan"}, \code{"Euclidean"}, \code{"Mahalanobis"} or \code{"minimax"} all the non numeric variables in \code{data.rec} and \code{data.don} will be converted to numeric.  On the contrary, when \code{dist.fun="exact"} or \cr
+When \code{dist.fun="Manhattan"}, \code{"Euclidean"}, \code{"Mahalanobis"} or \code{"minimax"} all the variables in \code{data.rec} and \code{data.don} must be numeric.  On the contrary, when \code{dist.fun="exact"} or \cr
 \code{dist.fun="exact matching"}, all the variables in \code{data.rec} and \code{data.don} will be converted to character and, as far as the distance computation is concerned, they will be treated as categorical nominal variables, i.e. distance is 0 if a couple of units shows the same response category and 1 otherwise. 
 }
 

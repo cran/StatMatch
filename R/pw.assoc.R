@@ -100,23 +100,39 @@ function(formula, data, weights=NULL, out.df=FALSE)
 ###################################################
 ###################################################
     n <- nrow(data)
-    if(is.null(weights)) ww <- rep(1, nrow(data))
-    else{
+    if(!is.null(weights)){
+        # ww <- rep(1, nrow(data))
+    # else{
         ww <- data[,weights]
         ww <- ww/sum(ww)*n
-        data <- data[,setdiff(colnames(data), weights)]
+        #data <- data[,setdiff(colnames(data), weights)]
+        lab.w <- paste(weights, 'r', sep=".")
+        data[, lab.w] <- ww
     }
     # n <- sum(ww)
     
-    df <- model.frame(formula=formula, data=data)
-    lab <- colnames(df)
-    p.x <- length(lab) - 1
+#    df <- model.frame(formula=formula, data=data)
+#    lab <- colnames(df)
+#    p.x <- length(lab) - 1
+    lab <- all.vars(formula)
+    lab.y <- lab[1]
+    if(lab[2]=='.') lab.x <- setdiff(colnames(data), c(lab[1], weights, lab.w))
+    else lab.x <- lab[-1]
+    p.x <- length(lab.x)
+    
     vV <- vbcV <- vlambda <- vtau <- vU  <- vI <- vnI <- vAIC <- vBIC <- vdf <- numeric(p.x)
     for(i in 1:p.x){
-        pos <- i+1
-        form <- paste(lab[1], lab[pos], sep="+")
-        form <- paste("ww", form, sep="~")
-        tab <- xtabs(as.formula(form), data=df)
+        # pos <- i+1
+        tst <- is.na(data[,lab.y]) | is.na(data[,lab.x[i]])
+        form <- paste(lab.y, lab.x[i], sep="+")
+        form <- paste0("~", form)
+        # form <- paste("ww", form, sep="~")
+        if(!is.null(weights)){
+            form <- paste0(lab.w, form)
+        }
+        
+        tab <- xtabs(as.formula(form), data=data[!tst, ])
+
         Vs <- V(tab)
         vV[i] <- Vs[1] #standard Cramer's V
         vbcV[i] <- Vs[2] # bias corrected Cramer's V
@@ -133,8 +149,9 @@ function(formula, data, weights=NULL, out.df=FALSE)
         vBIC[i] <- ics["row|col", "BIC"]
         vdf[i] <- ics["row|col", "df"]
     }
-    lab.am.assoc <- paste(lab[1], lab[-1], sep="_" )
-    lab.am.cond <- paste(lab[1], lab[-1], sep="|" )
+    #lab.am.assoc <- paste(lab.y, lab.x, sep="_" )
+    #lab.am.cond <- paste(lab.y, lab.x, sep="|" )
+    lab.am.assoc <- lab.am.cond <- lab.x
     names(vV) <- names(vbcV) <- names(vI) <- names(vnI) <-  lab.am.assoc
     names(vlambda) <- names(vtau) <- names(vU) <- names(vAIC) <- names(vBIC) <- names(vdf) <- lab.am.cond
     

@@ -4,7 +4,7 @@
 \title{Transforms a categorical variable in a set of dummy variables}
 
 \description{
-Transforms a factor or more factors contained in a data frame in a set of dummy variables.
+Transforms a factor or more factors contained in a data frame in a set of dummy variables, while numeric variables remain unchanged.
 }
 
 \usage{
@@ -14,7 +14,7 @@ fact2dummy(data, all=TRUE, lab="x")
 \arguments{
 
 \item{data}{
-  	A factor or a data frame that contains one or more factors (columns whose class is \dQuote{factor} or \dQuote{ordered}) that have to be substituted by dummy variables. 
+  	A factor or a data frame that contains one or more factors (columns whose class is \dQuote{factor} or \dQuote{ordered}) that have to be substituted by the corresponding dummy variables. 
 }
 
 \item{all}{
@@ -28,7 +28,8 @@ fact2dummy(data, all=TRUE, lab="x")
 }
   
 \details{
-This function substitutes categorical variables  in the input data frame (columns whose class is \dQuote{factor} or \dQuote{ordered}) with the corresponding dummy variables.    
+This function substitutes categorical variables in the input data frame (columns whose class is \dQuote{factor} or \dQuote{ordered}) with the corresponding dummy variables. Note that if a factor includes a missing values (NA) then all the associated dummies will report an NA in correspondence of the missing observation (row).
+   
 } 
 
 

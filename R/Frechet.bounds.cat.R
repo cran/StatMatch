@@ -22,10 +22,9 @@ Frechet.bounds.cat <- function (tab.x, tab.xy, tab.xz,
         dimnames(low) <- dimnames(upper) <- dimnames(ind) <- list(lab.y, 
                                                                   lab.z)
         class(low) <- class(upper) <- class(ind) <- "table"
-        H.y <- sum(-1 * p.y * log(p.y), na.rm = TRUE)
-        H.z <- sum(-1 * p.z * log(p.z), na.rm = TRUE)
-        res.0 <- list(low.u = low, up.u = upper, IA = ind, H = c(H.y, 
-                                                                 H.z), uncertainty = mean(upper - low))
+        # H.y <- sum(-1 * p.y * log(p.y), na.rm = TRUE)
+        # H.z <- sum(-1 * p.z * log(p.z), na.rm = TRUE)
+        res.0 <- list(low.u = low, up.u = upper, IA = ind, uncertainty = mean(upper - low))
         if (prn == "tables") {
             out <- res.0
         }
@@ -34,8 +33,7 @@ Frechet.bounds.cat <- function (tab.x, tab.xy, tab.xz,
             colnames(df) <- c("Y", "Z", "low.u")
             df$IA <- c(ind)
             df$up.u <- c(upper)
-            out <- list(bounds = df, H = c(H.y, H.z), uncertainty = mean(upper - 
-                                                                             low))
+            out <- list(bounds = df, uncertainty = mean(upper - low))
         }
         out
     }

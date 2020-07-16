@@ -2,6 +2,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
           dist.fun = "Manhattan", constrained = FALSE, constr.alg = "Hungarian", 
           k=1, keep.t = FALSE, ...) 
 {
+# initial checks on the input arguments    
     p <- length(match.vars)
     if (!is.null(dim(data.rec))) {
         nr <- nrow(data.rec)
@@ -19,6 +20,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
         nd <- length(data.don)
         d.lab <- names(data.don)
     }
+# labels of the observations    
     if (is.null(r.lab)) 
         r.lab <- paste("rec", 1:nr, sep = "=")
     else r.lab <- paste("rec", r.lab, sep = "=")
@@ -27,17 +29,16 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
         d.lab <- paste("don", 1:nd, sep = "=")
     else d.lab <- paste("don", d.lab, sep = "=")
     row.names(data.don) <- d.lab
+# check the coherence between the type of matching variables and the distance
     if (!is.null(match.vars)) {
-        if (dist.fun == "Euclidean" || dist.fun == "euclidean" || 
-            dist.fun == "Manhattan" || dist.fun == "Mahalanobis" || 
-            dist.fun == "mahalanobis" || dist.fun == "manhattan" || 
-            dist.fun == "minimax" || dist.fun == "MiniMax" || 
-            dist.fun == "Minimax") {
-            cat("Warning: The ", dist.fun, " distance is being used", 
-                fill = TRUE)
-            cat("All the categorical matching variables in rec and don \n data.frames, if present are recoded into dummies", 
-                fill = TRUE)
-        }
+        
+        if (
+            (tolower(dist.fun) %in% c("euclidean", "manhattan", 
+                                      "mahalanobis", "minimax"))
+            & (!all(sapply(data.rec[,match.vars], is.numeric)))
+        )
+        stop("The chosen distance function requires numeric matching variables \n
+             with mixed-type matching variables please use the Gower's distance")
         if (dist.fun == "exact" || dist.fun == "exact matching") {
             cat("Warning: the exact matching distance is being used", 
                 fill = TRUE)
@@ -45,6 +46,10 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
                 fill = TRUE)
         }
     }
+###### END of initial checks
+#####################################
+# 'ghost' function used at the core of NND
+#    
     NND.hd <- function(rec, don, dfun = "Manhattan", constr = FALSE, 
                        c.alg = NULL, ...) {
         x.rec <- rec
@@ -63,27 +68,15 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
             d.lab <- paste("don", 1:nr, sep = "=")
         if (dfun == "Euclidean" || dfun == "euclidean" || dfun == 
             "Manhattan" || dfun == "manhattan") {
-            if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = TRUE)
-            if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = TRUE)
             mdist <- proxy::dist(x = x.rec, y = x.don, method = dfun, 
                           ...)
         }
         else if (dfun == "Mahalanobis" || dfun == "mahalanobis") {
-            if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = TRUE)
-            if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = TRUE)
             mdist <- mahalanobis.dist(data.x = x.rec, data.y = x.don, 
                                       ...)
         }
         else if (dfun == "minimax" || dfun == "MiniMax" || dfun == 
                  "Minimax") {
-            if (is.data.frame(x.rec)) 
-                x.rec <- fact2dummy(x.rec, all = TRUE)
-            if (is.data.frame(x.don)) 
-                x.don <- fact2dummy(x.don, all = TRUE)
             mdist <- maximum.dist(data.x = x.rec, data.y = x.don, 
                                   ...)
         }
@@ -106,6 +99,12 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
             mdist[is.nan(mdist)] <- 1
             mdist[is.na(mdist)] <- 1
         }
+        # else if (tolower(dfun) == "modgower") {
+        #     mdist <- gower.dist.mod(data.x = x.rec, data.y = x.don, 
+        #                         ...)
+        #     mdist[is.nan(mdist)] <- 1
+        #     mdist[is.na(mdist)] <- 1
+        # }
         else {
             mdist <- proxy::dist(x = x.rec, y = x.don, method = dfun, 
                           ...)
@@ -172,7 +171,7 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
         if (constr && (c.alg == "Hungarian" || c.alg == "hungarian")) {
             if (nr > nd) 
                 stop("When using the Hungarian algorithm \n the no. of donors must be greater \n or equal than the no. of recipients")
-            sol <- solve_LSAP(x = mdist, maximum = FALSE)
+            sol <- clue::solve_LSAP(x = mdist, maximum = FALSE)
             rec.lab <- r.lab
             don.lab <- d.lab[as.integer(sol)]
             dist.rd <- mdist[cbind(rec.lab, don.lab)]
@@ -185,6 +184,8 @@ NND.hotdeck <- function (data.rec, data.don, match.vars, don.class = NULL,
                           noad = nad, call = match.call())
         fine
     }
+##### END of the 'ghost' function NND.hd()
+##################################################
     if (is.null(don.class)) {
         out <- NND.hd(rec = data.rec[, match.vars, drop = FALSE], 
                       don = data.don[, match.vars, drop = FALSE], dfun = dist.fun, 

@@ -27,10 +27,14 @@ function (data.rec, data.don, match.vars=NULL, don.class=NULL, dist.fun="Manhatt
 	
     p <- length(match.vars)
     if(!is.null(match.vars)){
-        if(dist.fun=="Euclidean" || dist.fun=="euclidean" || dist.fun=="Manhattan" || dist.fun=="manhattan" || dist.fun=="Mahalanobis" || dist.fun=="mahalanobis" || dist.fun=="minimax" || dist.fun=="MiniMax" || dist.fun=="Minimax"){
-            cat("Warning: The ", dist.fun, " distance is being used", fill=TRUE)
-            cat("All the categorical matching variables in rec and don data.frames, \n if present, are recoded into dummies", fill=TRUE)
-        }
+        if (
+            (tolower(dist.fun) %in% c("euclidean", "manhattan", 
+                                      "mahalanobis", "minimax"))
+            & (!all(sapply(data.rec[,match.vars], is.numeric)))
+        )
+            stop("The chosen distance function requires numeric matching variables, \n
+                 with mixed-type matching variables please use Gower's distance")
+        
         if(dist.fun=="exact" || dist.fun=="exact matching"){
             cat("Warning: the exact matching distance is being used", fill=TRUE)
             cat("all the matching variables in rec and don are converted to \n character variables and are treated as categorical nominal", fill=TRUE)
@@ -78,20 +82,17 @@ RANDwNND.hd <- function (rec, don, dfun="Manhattan", cut.don="rot", k=NULL, w.do
     
     if(dfun=="Euclidean" || dfun=="Manhattan"){
    #     require(proxy)
-        x.rec <- fact2dummy(x.rec, all=TRUE)
-        x.don <- fact2dummy(x.don, all=TRUE)
+        
         mdist <- proxy::dist(x=x.rec, y=x.don, method=dfun, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
     }
 	else if(dfun=="Mahalanobis" || dfun=="mahalanobis"){
-        if(is.data.frame(x.rec)) x.rec <- fact2dummy(x.rec, all=TRUE)
-        if(is.data.frame(x.don)) x.don <- fact2dummy(x.don, all=TRUE)
+       
         mdist <- mahalanobis.dist(data.x=x.rec, data.y=x.don, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
 	}
 	else if(dfun=="minimax" || dfun=="MiniMax" || dfun=="Minimax"){
-        x.rec <- fact2dummy(x.rec, all=TRUE)
-        x.don <- fact2dummy(x.don, all=TRUE)
+        
         mdist <- maximum.dist(data.x=x.rec, data.y=x.don, ...)
         dimnames(mdist) <- list(r.lab, d.lab)
 	}
