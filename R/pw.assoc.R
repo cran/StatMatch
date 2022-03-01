@@ -131,7 +131,7 @@ function(formula, data, weights=NULL, out.df=FALSE)
             form <- paste0(lab.w, form)
         }
         
-        tab <- xtabs(as.formula(form), data=data[!tst, ])
+        tab <- xtabs(as.formula(form), data=data[!tst, ], drop.unused.levels = TRUE)
 
         Vs <- V(tab)
         vV[i] <- Vs[1] #standard Cramer's V

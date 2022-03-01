@@ -1,14 +1,12 @@
 `fact2dummy` <-
 function (data, all=TRUE, lab="x") 
 {
-#########################################
 	dum.fcn <- function(x, all=TRUE){
         fine <- model.matrix.lm(~x-1, na.action = "na.pass")
 		colnames(fine) <- levels(x)
 		if(!all) fine <- fine[,-ncol(fine), drop=FALSE]
 		fine
-	}
-###########################################
+    }
 	
 	if(is.null(dim(data))){
 		if(class(data)[1]=="numeric" || class(data)[1]=="integer" || class(data)[1]=="logical") oo <- cbind(1*data)

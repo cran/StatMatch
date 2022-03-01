@@ -1,7 +1,7 @@
 % --- Source file: fact2dummy.Rd ---
 \name{plotTab}
 \alias{plotTab}
-\title{graphical comparison of the estimated distributions for the same continuous variable.}
+\title{Graphical comparison of the estimated distributions for the same categorical variable.}
 
 \description{
 Compares graphically the estimated distributions for the same categorical variable(s) using data coming from two different data sources.

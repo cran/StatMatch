@@ -44,7 +44,7 @@ This data set is artificially created starting from the EU--SILC survey structur
 }
 
 \references{
-\url{http://ec.europa.eu/eurostat/web/income-and-living-conditions/overview}
+\url{https://ec.europa.eu/eurostat/web/income-and-living-conditions/overview}
 }
 
 \keyword{datasets}

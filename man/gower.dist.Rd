@@ -8,7 +8,7 @@
 }
 
 \usage{
-gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL)
+gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL, robcb=NULL)
 }
 
 \arguments{
@@ -41,6 +41,10 @@ When \code{TRUE} (default) the extension of the Gower's dissimilarity measure pr
 
 \item{var.weights}{
 By default (\code{NULL}) each variable has the same weight (value 1) when calculating the overall distance (weighted average of distances on single variables; see Details). User can specify different weights for the different variables by providing a numeric value for each of the variables contributing to the distance. In other words, \code{var.weights} should be set equal to a numeric vector having length equal to the number of variables considered in calculating distance.  Entered weights are scales to sum up to 1. 
+}
+
+\item{robcb}{
+By default is (\code{NULL}). If \code{robcb="IQR"} the scaling of the Manhattan distance is done by the Inter--quartile range. In alternative,  \code{robcb="IDR"} the scaling of the Manhattan distance is done by the Inter--decile range. In this case scaled distances greater than 1 are set equal to 1. This option is suggested in the presence of outliers in the continuous variables.
 }
 
 }

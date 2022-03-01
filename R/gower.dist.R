@@ -1,5 +1,5 @@
 gower.dist<- function(data.x, data.y = data.x, rngs = NULL, KR.corr = TRUE,
-                      var.weights = NULL){
+                      var.weights = NULL, robcb=NULL){
 
 ####################    
         gower.fcn <- function(x, y, rng = NULL, KR.corr = TRUE) {
@@ -51,9 +51,20 @@ gower.dist<- function(data.x, data.y = data.x, rngs = NULL, KR.corr = TRUE,
         }
         else {
             if (is.null(rng) || is.na(rng)) rng <- max(x, y, na.rm=TRUE) - min(x, y, na.rm=TRUE)
+            if(!is.null(robcb)){
+                if(tolower(robcb)=="iqr") {
+                    rng <- IQR(x=c(x,y), na.rm = TRUE)
+                }
+                if(tolower(robcb)=="idr") {
+                    rng <- c(quantile(x = c(x,y), probs=0.9, na.rm=TRUE) - 
+                                 quantile(x = c(x,y), probs=0.1, na.rm=TRUE))
+                }
+            }  
             
             if(rng==0) dd <- matrix(0, nx, ny)
             else dd <- abs(outer(X = x, Y = y, FUN = "-"))/rng
+            dd[dd>1] <- 1
+            
             delta[outer(is.na(x), is.na(y), FUN = "|")] <- 0
         }
         list(dist = dd, delta = delta)

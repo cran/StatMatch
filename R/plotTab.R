@@ -1,8 +1,6 @@
 plotTab <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL){
-################
-    Freq <- x <- Sample <- NULL
-###########################
     
+    x <- Freq <- Sample <- NULL
     if(is.null(xlab.B)) xlab.B <- xlab.A
     if(!is.null(xlab.B)) if(length(xlab.B) != length(xlab.A)) stop("Different number of variables")
     

@@ -1,6 +1,17 @@
+1.4.1 Addedd function for comparing distributions, improved graphical comparisons
+
+		comp.cont is a NEW function for empirical comparison of the marginal distributions of the same numerical variable(s) 
+		but estimated from two different data sources
+
+		plotCont plots and compares also the empirical cumulative distribution function estimated 
+		from two different data sources
+
+
+######################################################################################################################
+
 1.4.0 Addedd functions for plotting results, changes to some code for better management of the NAs
 
-		NND.hotdeck and RANDwNND.hotdeck NO more trasform the categorical matching variables in dummies
+		NND.hotdeck and RANDwNND.hotdeck NO longer trasform the categorical matching variables in dummies
 		when the chosen distance function is defined only for numerical variables; in practice, mixed-type matching variables
 		can only be used with the Gower's distance
 
@@ -10,7 +21,7 @@
 		pw.assoc discards NAs before calculation of the associaione or PRE measures; removal follows the pairwise 
 		deletion rule (units where one of both the values are missing are discarded)
 
-		plotTab is a NEW function for comparing the marginal distributions of the same categorica variable(s) but estimated 
+		plotTab is a NEW function for comparing the marginal distributions of the same categorical variable(s) but estimated 
 		from two different data sources
 
 		plotCont is a NEW function for comparing the marginal distributions of the same numerical variable but 
