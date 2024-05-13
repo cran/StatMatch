@@ -6,25 +6,38 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
         xx <- x[!is.na(x)]
         
         if(is.null(w)) {
-            iqr.x <- IQR(xx)
+            # iqr.x <- IQR(xx)
+            qq <- quantile(x = xx, probs = c(0.25, 0.5, 0.75))
             deff.uw <- 1
         }
         else{
             ww <- w[!is.na(x)]
-            wQ <- Hmisc::wtd.quantile(x = xx, weights = ww, probs = c(0.25, 0.75))
-            iqr.x <- c(wQ[2] - wQ[1])
+            qq <- Hmisc::wtd.quantile(x = xx, weights = ww, 
+                                      probs = c(0.25, 0.5, 0.75))
             deff.uw <- length(ww) * sum(ww^2)/(sum(ww)^2)
         }
+        iqr.x <- c(qq[3] - qq[1])
+        
         if(is.null(n)) nn <- length(xx) / deff.uw
         else nn <- n
         wid.FD <- 2 * iqr.x* 1/(nn^(1/3))
-        bins <- (max(xx)-min(xx))/wid.FD
+        # robust boxplot fences
+        low <- max(min(xx), qq[1] - 1.5*2*(qq[2]-qq[1]) )
+        up <-  min(max(xx), qq[3] + 1.5*2*(qq[3]-qq[2]) ) 
+        
+        bins <- (up - low)/wid.FD
         bins <- floor(bins)+1
         if(bins==1){
             bins <- 2
-            wid.FD <- (max(xx)-min(xx))/bins
+            wid.FD <- (max(xx) - min(xx))/bins
         }
-        seq(from=min(xx), to=max(xx), by=wid.FD)
+        # adjust for low and up
+        span <- bins*wid.FD
+        dd <- span - (up - low)
+        low <- low - dd/2
+        up <- up + dd/2
+        # final breaks
+        seq(from=low, to=up, by=wid.FD)
     }
 #################################################################    
 # preparation    
@@ -70,7 +83,6 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
         if(!is.null(w.B)) tB <- prop.table(xtabs(data.B[,w.B]~cxB))
         
         if(type=="hist"){
-            Var1 <- Freq <- NULL
             dfA <- cbind(data.frame(tA), sample="A")
             dfB <- cbind(data.frame(tB), sample="B")
             colnames(dfA) <- colnames(dfB) <- c("Var1", "Freq", "sample")
@@ -86,19 +98,20 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
             btmlab <- paste(pr.lab, labtvd, sep=", ")
             
             out <- ggplot(data = df, 
-                          aes(x = Var1, y = Freq, fill = sample)) +
+                          aes(x = .data$Var1, y = .data$Freq, 
+                              fill = .data$sample)) +
                 geom_bar(stat = "identity", position = "dodge") +
                 labs(x = btmlab, y="rel freq")
         
         }
         if(type=="density"){
-            x <- w <- NULL
             dfxA = data.frame(x=midp, sample="A")
             dfxB = data.frame(x=midp, sample="B")
             xx <- rbind(dfxA, dfxB)
             colnames(xx) <- c(pr.lab, "sample")
             xx$w <- c(tA, tB)
-            out <- ggplot2::ggplot(xx, aes(xx[ ,pr.lab], weight=w, fill=sample, colour=sample)) +
+            out <- ggplot2::ggplot(xx, aes(xx[ ,pr.lab], weight=.data$w, 
+                                           colour=.data$sample)) +
                 geom_density(alpha=0.4, lwd=0.8, adjust=0.5) +
                 labs(x = pr.lab)
         }    
@@ -114,15 +127,16 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
         k <- length(usx)
         ecdf.xA <- ecdf.xB <- numeric(k)
         for(i in 1:k){
-            ecdf.xA[i] <- sum(ww.A[xA <= usx[i]])/sum(ww.A)
-            ecdf.xB[i] <- sum(ww.B[xB <= usx[i]])/sum(ww.B)
+            ecdf.xA[i] <- sum(ww.A[xA <= usx[i]])
+            ecdf.xB[i] <- sum(ww.B[xB <= usx[i]])
         }
         
         dfxA = data.frame(x=usx, ecdf=ecdf.xA, sample="A")
         dfxB = data.frame(x=usx, ecdf=ecdf.xB, sample="B")
         xx <- rbind(dfxA, dfxB)
         
-        out <- ggplot2::ggplot(xx, aes(x=x, y=ecdf, color=sample)) +
+        out <- ggplot2::ggplot(xx, aes(x=.data$x, y=.data$ecdf, 
+                                       color=.data$sample)) +
             geom_point(size=0.5) +
             geom_line() +
             xlab(label = xlab.A) +
@@ -133,9 +147,10 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
     # comparison of empirical quantiles 
     if(type=="qqplot" | type=="qqshift"){
         # decision concerning quantiles
-        if(n<20) pctp <- c(0.25, 0.50, 0.75)
-        if(n>=20 & n<=30) pctp <- seq(from = 0.1,to = 0.9,by = 0.1)
-        if(n>30) pctp <- seq(from = 0.05,to = 0.95,by = 0.05)
+        if(n <= 50) pctp <- c(0.25, 0.50, 0.75)
+        if(n > 50 & n <= 150) pctp <- seq(from = 0.2, to = 0.8, by = 0.2)
+        if(n > 150 & n <= 250) pctp <- seq(from = 0.1, to = 0.9, by = 0.1)
+        if(n > 250) pctp <- seq(from = 0.05, to = 0.95, by = 0.05)
         # derive empirical quantiles
         qA <- quantile(x = xA, probs = pctp)
         if(!is.null(w.A)) {

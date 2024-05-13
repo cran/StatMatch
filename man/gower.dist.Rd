@@ -8,7 +8,8 @@
 }
 
 \usage{
-gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL, robcb=NULL)
+gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL, 
+           robcb=NULL)
 }
 
 \arguments{
@@ -28,7 +29,7 @@ If only \code{data.x} is supplied, the dissimilarities between rows of \code{dat
 }
 
 \item{rngs}{
-A vector with the ranges to scale the variables. Its length must be equal to number of variables in \code{data.x}. In correspondence of nonnumeric variables, just put 1 or \code{NA}. When \code{rngs=NULL} (default) the range of a numeric variable is estimated by jointly considering the values for the variable in \code{data.x} and those in \code{data.y}. Therefore, assuming \code{rngs=NULL}, if a variable \code{"X1"} is considered:
+A vector with the ranges to scale the variables. Its length must be equal to number of variables in \code{data.x}. In correspondence of non-numeric variables, just put 1 or \code{NA}. When \code{rngs=NULL} (default) the range of a numeric variable is estimated by jointly considering the values for the variable in \code{data.x} and those in \code{data.y}. Therefore, assuming \code{rngs=NULL}, if a variable \code{"X1"} is considered:
 \preformatted{
 rngs["X1"] <- max(data.x[,"X1"], data.y[,"X1"]) - 
                min(data.x[,"X1"], data.y[,"X1"])}.
@@ -44,7 +45,7 @@ By default (\code{NULL}) each variable has the same weight (value 1) when calcul
 }
 
 \item{robcb}{
-By default is (\code{NULL}). If \code{robcb="IQR"} the scaling of the Manhattan distance is done by the Inter--quartile range. In alternative,  \code{robcb="IDR"} the scaling of the Manhattan distance is done by the Inter--decile range. In this case scaled distances greater than 1 are set equal to 1. This option is suggested in the presence of outliers in the continuous variables.
+By default is (\code{NULL}). If \code{robcb="boxp"} the scaling of the Manhattan distance is done by using the difference between upper and lower fences of the Boxplot with k=3. In alternative,  \code{robcb="asyboxp"} the scaling of the Manhattan distance is done by the difference between upper and lower fences of the modified Boxplot to accocunt for slight skewness. In this case scaled distances greater than 1 are set equal to 1. This option is suggested in the presence of outliers in the continuous variables.
 }
 
 }

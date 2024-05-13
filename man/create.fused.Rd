@@ -19,7 +19,7 @@ A matrix or data frame that plays the role of \emph{recipient} in the statistica
 }
 
 \item{data.don}{
-A matrix or data frame that that plays the role of \emph{donor} in the statistical matching application.
+A matrix or data frame that plays the role of \emph{donor} in the statistical matching application.
 }
 
 \item{mtc.ids}{

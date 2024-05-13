@@ -52,13 +52,16 @@ gower.dist<- function(data.x, data.y = data.x, rngs = NULL, KR.corr = TRUE,
         else {
             if (is.null(rng) || is.na(rng)) rng <- max(x, y, na.rm=TRUE) - min(x, y, na.rm=TRUE)
             if(!is.null(robcb)){
-                if(tolower(robcb)=="iqr") {
-                    rng <- IQR(x=c(x,y), na.rm = TRUE)
+                qq <- quantile(x = c(x,y), probs=c(0.25, 0.5, 0.75))
+                if(tolower(robcb)=="boxp") {
+                    low <- max(low, qq[1] - 3*(qq[3]-qq[1]) )
+                    up <-  min( up, qq[3] + 3*(qq[3]-qq[1]) ) 
                 }
-                if(tolower(robcb)=="idr") {
-                    rng <- c(quantile(x = c(x,y), probs=0.9, na.rm=TRUE) - 
-                                 quantile(x = c(x,y), probs=0.1, na.rm=TRUE))
+                if(tolower(robcb)=="asyboxp") {
+                    low <- max(low, qq[1] - 1.5*2*(qq[2]-qq[1]) )
+                    up <-  min( up, qq[3] + 1.5*2*(qq[3]-qq[2]) ) 
                 }
+                rng <- up - low
             }  
             
             if(rng==0) dd <- matrix(0, nx, ny)

@@ -1,35 +1,46 @@
-comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL, 
-          w.B = NULL, ref = FALSE) 
+comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, 
+                       w.A = NULL, w.B = NULL, ref = FALSE) 
 {
-###################################################
+    ###################################################
     hist.bks <- function(x, w=NULL, n=NULL){
         
         xx <- x[!is.na(x)]
         
         if(is.null(w)) {
-            iqr.x <- IQR(xx)
+            # iqr.x <- IQR(xx)
+            qq <- quantile(x = xx, probs = c(0.25, 0.5, 0.75))
             deff.uw <- 1
         }
         else{
             ww <- w[!is.na(x)]
-            wQ <- Hmisc::wtd.quantile(x = xx, weights = ww, probs = c(0.25, 0.75))
-            iqr.x <- c(wQ[2] - wQ[1])
+            qq <- Hmisc::wtd.quantile(x = xx, weights = ww, 
+                                      probs = c(0.25, 0.5, 0.75))
             deff.uw <- length(ww) * sum(ww^2)/(sum(ww)^2)
         }
+        iqr.x <- c(qq[3] - qq[1])
+        
         if(is.null(n)) nn <- length(xx) / deff.uw
         else nn <- n
         wid.FD <- 2 * iqr.x* 1/(nn^(1/3))
-        bins <- (max(xx)-min(xx))/wid.FD
+        # robust boxplot fences
+        low <- max(min(xx), qq[1] - 1.5*2*(qq[2]-qq[1]) )
+        up <-  min(max(xx), qq[3] + 1.5*2*(qq[3]-qq[2]) ) 
+        
+        bins <- (up - low)/wid.FD
         bins <- floor(bins)+1
         if(bins==1){
             bins <- 2
-            wid.FD <- (max(xx)-min(xx))/bins
+            wid.FD <- (max(xx) - min(xx))/bins
         }
-        seq(from=min(xx), to=max(xx), by=wid.FD)
+        # adjust for low and up
+        span <- bins*wid.FD
+        dd <- span - (up - low)
+        low <- low - dd/2
+        up <- up + dd/2
+        # final breaks
+        seq(from=low, to=up, by=wid.FD)
     }
 #################################################################    
-    
-    
     # preparation
     nA <- nrow(data.A)
     nB <- nrow(data.B)
@@ -54,8 +65,8 @@ comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL,
     k <- length(usx)
     ecdf.xA <- ecdf.xB <- numeric(k)
     for(i in 1:k){
-        ecdf.xA[i] <- sum(wA[xA <= usx[i]])/sum(wA)
-        ecdf.xB[i] <- sum(wB[xB <= usx[i]])/sum(wB)
+        ecdf.xA[i] <- sum(wA[xA <= usx[i]])
+        ecdf.xB[i] <- sum(wB[xB <= usx[i]])
     }
     d.KS <- max(abs(ecdf.xA - ecdf.xB))
     d.Kui <- max(ecdf.xA - ecdf.xB) + max(ecdf.xB - ecdf.xA)
@@ -67,21 +78,21 @@ comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL,
     ############################################
     # quantiles
     n <- min(nA, nB)
-    if (n < 20) 
-        pctp <- c(0.25, 0.5, 0.75)
-    if (n >= 20 & n <= 30) 
-        pctp <- seq(from = 0.1, to = 0.9, by = 0.1)
-    if (n > 30) 
-        pctp <- seq(from = 0.05, to = 0.95, by = 0.05)
+    if(n <= 50) pctp <- c(0.25, 0.50, 0.75)
+    if(n > 50 & n <= 150) pctp <- seq(from = 0.2, to = 0.8, by = 0.2)
+    if(n > 150 & n <= 250) pctp <- seq(from = 0.1, to = 0.9, by = 0.1)
+    if(n > 250) pctp <- seq(from = 0.05, to = 0.95, by = 0.05)
     
     qA <- quantile(x = xA, probs = pctp)
     if (!is.null(w.A)) {
         qA <- Hmisc::wtd.quantile(x = xA, weights = wA, probs = pctp)
     }
+    
     qB <- quantile(x = xB, probs = pctp)
     if (!is.null(w.B)) {
         qB <- Hmisc::wtd.quantile(x = xB, weights = wB, probs = pctp)
     }
+    
     dQa <- mean(abs(qA-qB))
     dQ2 <- mean((qA-qB)^2)
     
@@ -105,10 +116,7 @@ comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL,
         names(smryB) <- NULL
         names(smryB) <- c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "sd")
     }
-    smryA[setdiff(names(smryB), names(smryA))] <- NA
-    smryB[setdiff(names(smryA), names(smryB))] <- NA
-    
-    smrys <- rbind(A=smryA, B=smryB)
+    smrys <- as.data.frame(dplyr::bind_rows(A=smryA, B=smryB))
     
     ###############################################
     # total variation distance (discretize continuous)
@@ -136,7 +144,7 @@ comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL,
     
     ##########################
     # output
-    list(summary = as.data.frame(smrys),
+    list(summary = smrys,
          diff.Qs = c(avAbsD=dQa, avSqrtSqD=sqrt(dQ2)),
          dist.ecdf = d.ecdf,
          dist.discr = c(tvd=tvd, overlap=1-tvd, Hellinger = sqrt(1 - bhatt)) 
