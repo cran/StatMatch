@@ -8,8 +8,7 @@
 }
 
 \usage{
-gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL, 
-           robcb=NULL)
+gower.dist(data.x, data.y=data.x, rngs=NULL, KR.corr=TRUE, var.weights = NULL, robcb=NULL)
 }
 
 \arguments{

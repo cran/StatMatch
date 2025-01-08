@@ -97,9 +97,9 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
                             sep="= ")
             btmlab <- paste(pr.lab, labtvd, sep=", ")
             
-            out <- ggplot(data = df, 
-                          aes(x = .data$Var1, y = .data$Freq, 
-                              fill = .data$sample)) +
+            out <- ggplot2::ggplot(data = df, 
+                                   aes(x = .data$Var1, y = .data$Freq, 
+                                   fill = .data$sample)) +
                 geom_bar(stat = "identity", position = "dodge") +
                 labs(x = btmlab, y="rel freq")
         
@@ -182,7 +182,7 @@ plotCont <- function(data.A, data.B, xlab.A, xlab.B=NULL, w.A=NULL, w.B=NULL,
             
             qq <- data.frame(qA=qB, qB=qA-qB)
             #colnames(qq) <- paste(xlab, c("A","B"), sep=".")
-            out <- ggplot(qq, aes(x=qA, y=qB)) +
+            out <- ggplot2::ggplot(qq, aes(x=qA, y=qB)) +
                 geom_point(shape=19, color="orangered1", size=3) +
                 geom_hline(yintercept = 0, color="blue", size=1.5, 
                            linetype="dashed") +

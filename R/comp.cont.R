@@ -1,5 +1,5 @@
-comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, 
-                       w.A = NULL, w.B = NULL, ref = FALSE) 
+comp.cont <- function (data.A, data.B, xlab.A, xlab.B = NULL, w.A = NULL, 
+          w.B = NULL, ref = FALSE) 
 {
     ###################################################
     hist.bks <- function(x, w=NULL, n=NULL){
